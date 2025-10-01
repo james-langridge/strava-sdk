@@ -74,10 +74,10 @@ export interface StravaClientConfig {
   };
   readonly logger?: Logger;
   readonly httpClient?: HttpClientConfig;
-  readonly onApiCall?: MonitoringHooks['onApiCall'];
-  readonly onError?: MonitoringHooks['onError'];
-  readonly onTokenRefresh?: MonitoringHooks['onTokenRefresh'];
-  readonly onRateLimit?: MonitoringHooks['onRateLimit'];
+  readonly onApiCall?: MonitoringHooks["onApiCall"];
+  readonly onError?: MonitoringHooks["onError"];
+  readonly onTokenRefresh?: MonitoringHooks["onTokenRefresh"];
+  readonly onRateLimit?: MonitoringHooks["onRateLimit"];
 }
 
 /**

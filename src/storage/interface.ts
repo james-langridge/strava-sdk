@@ -5,7 +5,7 @@
  * The library provides an in-memory implementation for development/testing.
  */
 
-import type { StoredTokens } from '../types';
+import type { StoredTokens } from "../types";
 
 export interface TokenStorage {
   /**

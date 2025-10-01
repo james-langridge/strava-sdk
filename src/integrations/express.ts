@@ -4,10 +4,10 @@
  * Provides Express middleware for OAuth and webhook handling.
  */
 
-import type { Request, Response, RequestHandler } from 'express';
-import type { StravaClient } from '../core/client';
-import type { WebhookEvent, WebhookVerificationParams } from '../types';
-import { validateWebhookVerification } from '../utils';
+import type { Request, Response, RequestHandler } from "express";
+import type { StravaClient } from "../core/client";
+import type { WebhookEvent, WebhookVerificationParams } from "../types";
+import { validateWebhookVerification } from "../utils";
 
 /**
  * OAuth callback options
@@ -16,7 +16,7 @@ export interface OAuthCallbackOptions {
   readonly onSuccess: (
     req: Request,
     res: Response,
-    tokens: Awaited<ReturnType<StravaClient['oauth']['exchangeCode']>>,
+    tokens: Awaited<ReturnType<StravaClient["oauth"]["exchangeCode"]>>,
   ) => void | Promise<void>;
   readonly onError: (
     req: Request,
@@ -33,7 +33,10 @@ export function createOAuthHandlers(client: StravaClient) {
     /**
      * GET handler to redirect to Strava authorization
      */
-    authorize: (options?: { scopes?: string[]; state?: string }): RequestHandler => {
+    authorize: (options?: {
+      scopes?: string[];
+      state?: string;
+    }): RequestHandler => {
       return (_req: Request, res: Response) => {
         const authUrl = client.oauth.getAuthUrl({
           scopes: options?.scopes,
@@ -57,8 +60,8 @@ export function createOAuthHandlers(client: StravaClient) {
             return;
           }
 
-          if (!code || typeof code !== 'string') {
-            const err = new Error('Missing authorization code');
+          if (!code || typeof code !== "string") {
+            const err = new Error("Missing authorization code");
             await options.onError(req, res, err);
             return;
           }
@@ -69,7 +72,7 @@ export function createOAuthHandlers(client: StravaClient) {
           await options.onError(
             req,
             res,
-            error instanceof Error ? error : new Error('Unknown error'),
+            error instanceof Error ? error : new Error("Unknown error"),
           );
         }
       };
@@ -98,16 +101,18 @@ export function createWebhookHandlers(
     verify: (): RequestHandler => {
       return (req: Request, res: Response) => {
         const params: WebhookVerificationParams = {
-          'hub.mode': req.query['hub.mode'] as string | undefined,
-          'hub.verify_token': req.query['hub.verify_token'] as string | undefined,
-          'hub.challenge': req.query['hub.challenge'] as string | undefined,
+          "hub.mode": req.query["hub.mode"] as string | undefined,
+          "hub.verify_token": req.query["hub.verify_token"] as
+            | string
+            | undefined,
+          "hub.challenge": req.query["hub.challenge"] as string | undefined,
         };
 
         const result = validateWebhookVerification(
           {
-            mode: params['hub.mode'],
-            token: params['hub.verify_token'],
-            challenge: params['hub.challenge'],
+            mode: params["hub.mode"],
+            token: params["hub.verify_token"],
+            challenge: params["hub.challenge"],
           },
           options.verifyToken,
         );
@@ -117,7 +122,7 @@ export function createWebhookHandlers(
           return;
         }
 
-        res.json({ 'hub.challenge': result.challenge });
+        res.json({ "hub.challenge": result.challenge });
       };
     },
 
@@ -133,7 +138,7 @@ export function createWebhookHandlers(
 
           await client.webhooks.processEvent(event);
         } catch (error) {
-          console.error('Webhook processing error:', error);
+          console.error("Webhook processing error:", error);
         }
       };
     },
@@ -149,6 +154,8 @@ export function createExpressHandlers(
 ) {
   return {
     oauth: createOAuthHandlers(client),
-    webhooks: createWebhookHandlers(client, { verifyToken: webhookVerifyToken }),
+    webhooks: createWebhookHandlers(client, {
+      verifyToken: webhookVerifyToken,
+    }),
   };
 }

@@ -24,12 +24,12 @@ npm install strava-sdk
 ### Step 1: Initialize the Client
 
 ```typescript
-import { StravaClient, MemoryStorage } from 'strava-sdk';
+import { StravaClient, MemoryStorage } from "strava-sdk";
 
 const strava = new StravaClient({
   clientId: process.env.STRAVA_CLIENT_ID!,
   clientSecret: process.env.STRAVA_CLIENT_SECRET!,
-  redirectUri: 'http://localhost:3000/auth/callback',
+  redirectUri: "http://localhost:3000/auth/callback",
   storage: new MemoryStorage(), // Use your own storage implementation for production
 });
 ```
@@ -37,21 +37,21 @@ const strava = new StravaClient({
 ### Step 2: Implement OAuth Flow
 
 ```typescript
-import express from 'express';
+import express from "express";
 
 const app = express();
 
 // Redirect user to Strava authorization
-app.get('/auth/strava', (req, res) => {
+app.get("/auth/strava", (req, res) => {
   const authUrl = strava.oauth.getAuthUrl({
-    scopes: ['activity:read_all', 'activity:write'],
-    state: 'optional-csrf-token',
+    scopes: ["activity:read_all", "activity:write"],
+    state: "optional-csrf-token",
   });
   res.redirect(authUrl);
 });
 
 // Handle OAuth callback
-app.get('/auth/callback', async (req, res) => {
+app.get("/auth/callback", async (req, res) => {
   const { code } = req.query;
 
   try {
@@ -67,7 +67,7 @@ app.get('/auth/callback', async (req, res) => {
 
     res.send(`Welcome, ${tokens.athlete.firstname}!`);
   } catch (error) {
-    res.status(500).send('Authentication failed');
+    res.status(500).send("Authentication failed");
   }
 });
 ```
@@ -76,7 +76,7 @@ app.get('/auth/callback', async (req, res) => {
 
 ```typescript
 // Fetch an activity
-app.get('/activity/:id', async (req, res) => {
+app.get("/activity/:id", async (req, res) => {
   const { id } = req.params;
   const athleteId = req.session.athleteId; // From your session management
 
@@ -90,12 +90,12 @@ app.get('/activity/:id', async (req, res) => {
 });
 
 // Update an activity
-app.patch('/activity/:id', async (req, res) => {
+app.patch("/activity/:id", async (req, res) => {
   const { id } = req.params;
   const athleteId = req.session.athleteId;
 
   const activity = await strava.updateActivityWithRefresh(id, athleteId, {
-    description: 'Updated via API!',
+    description: "Updated via API!",
   });
 
   res.json(activity);
@@ -105,15 +105,15 @@ app.patch('/activity/:id', async (req, res) => {
 ### Step 4: Set Up Webhooks (Optional)
 
 ```typescript
-import { createExpressHandlers } from 'strava-sdk';
+import { createExpressHandlers } from "strava-sdk";
 
-const handlers = createExpressHandlers(strava, 'your-verify-token');
+const handlers = createExpressHandlers(strava, "your-verify-token");
 
 // Webhook verification endpoint (GET)
-app.get('/api/webhook', handlers.webhooks.verify());
+app.get("/api/webhook", handlers.webhooks.verify());
 
 // Webhook events endpoint (POST)
-app.post('/api/webhook', handlers.webhooks.events());
+app.post("/api/webhook", handlers.webhooks.events());
 
 // Handle webhook events
 strava.webhooks.onActivityCreate(async (event, athleteId) => {
@@ -140,15 +140,15 @@ strava.webhooks.onAthleteDeauthorize(async (event, athleteId) => {
 For production, implement the `TokenStorage` interface with your database:
 
 ```typescript
-import { TokenStorage, StoredTokens } from 'strava-sdk';
-import { Pool } from 'pg'; // Example with PostgreSQL
+import { TokenStorage, StoredTokens } from "strava-sdk";
+import { Pool } from "pg"; // Example with PostgreSQL
 
 class PostgresTokenStorage implements TokenStorage {
   constructor(private pool: Pool) {}
 
   async getTokens(athleteId: string): Promise<StoredTokens | null> {
     const result = await this.pool.query(
-      'SELECT * FROM strava_tokens WHERE athlete_id = $1',
+      "SELECT * FROM strava_tokens WHERE athlete_id = $1",
       [athleteId],
     );
 
@@ -177,10 +177,9 @@ class PostgresTokenStorage implements TokenStorage {
   }
 
   async deleteTokens(athleteId: string): Promise<void> {
-    await this.pool.query(
-      'DELETE FROM strava_tokens WHERE athlete_id = $1',
-      [athleteId],
-    );
+    await this.pool.query("DELETE FROM strava_tokens WHERE athlete_id = $1", [
+      athleteId,
+    ]);
   }
 }
 
@@ -215,7 +214,7 @@ const strava = new StravaClient({
 ### Error Handling
 
 ```typescript
-import { classifyError } from 'strava-sdk';
+import { classifyError } from "strava-sdk";
 
 try {
   const activity = await strava.api.getActivity(id, token);
@@ -224,7 +223,7 @@ try {
 
   if (classified.isRetryable) {
     // Retry the request
-  } else if (classified.errorCode === 'UNAUTHORIZED') {
+  } else if (classified.errorCode === "UNAUTHORIZED") {
     // Refresh token or re-authenticate
   } else {
     // Handle other errors

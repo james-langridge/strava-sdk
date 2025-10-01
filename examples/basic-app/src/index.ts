@@ -1,5 +1,5 @@
-import express from 'express';
-import { StravaClient, MemoryStorage, createExpressHandlers } from 'strava-sdk';
+import express from "express";
+import { StravaClient, MemoryStorage, createExpressHandlers } from "strava-sdk";
 
 const app = express();
 app.use(express.json());
@@ -10,10 +10,10 @@ const strava = new StravaClient({
   redirectUri: `${process.env.APP_URL}/auth/callback`,
   storage: new MemoryStorage(),
   logger: {
-    debug: (msg, meta) => console.log('[DEBUG]', msg, meta),
-    info: (msg, meta) => console.log('[INFO]', msg, meta),
-    warn: (msg, meta) => console.warn('[WARN]', msg, meta),
-    error: (msg, meta) => console.error('[ERROR]', msg, meta),
+    debug: (msg, meta) => console.log("[DEBUG]", msg, meta),
+    info: (msg, meta) => console.log("[INFO]", msg, meta),
+    warn: (msg, meta) => console.warn("[WARN]", msg, meta),
+    error: (msg, meta) => console.error("[ERROR]", msg, meta),
   },
 });
 
@@ -22,7 +22,7 @@ const handlers = createExpressHandlers(
   process.env.STRAVA_WEBHOOK_VERIFY_TOKEN!,
 );
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -53,14 +53,14 @@ app.get('/', (req, res) => {
 });
 
 app.get(
-  '/auth/strava',
+  "/auth/strava",
   handlers.oauth.authorize({
-    scopes: ['activity:read_all', 'activity:write'],
+    scopes: ["activity:read_all", "activity:write"],
   }),
 );
 
 app.get(
-  '/auth/callback',
+  "/auth/callback",
   handlers.oauth.callback({
     onSuccess: async (req, res, tokens) => {
       const athleteId = tokens.athlete.id.toString();
@@ -70,7 +70,7 @@ app.get(
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
         expiresAt: new Date(tokens.expires_at * 1000),
-        scopes: ['activity:read_all', 'activity:write'],
+        scopes: ["activity:read_all", "activity:write"],
       });
 
       res.send(`
@@ -116,12 +116,12 @@ app.get(
   }),
 );
 
-app.get('/activities/:athleteId', async (req, res) => {
+app.get("/activities/:athleteId", async (req, res) => {
   try {
     const { athleteId } = req.params;
 
     const activity = await strava.getActivityWithRefresh(
-      '1234567890',
+      "1234567890",
       athleteId,
     );
 
@@ -143,16 +143,22 @@ app.get('/activities/:athleteId', async (req, res) => {
       </html>
     `);
   } catch (error) {
-    res.status(500).send(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    res
+      .status(500)
+      .send(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
   }
 });
 
-app.get('/api/webhook', handlers.webhooks.verify());
+app.get("/api/webhook", handlers.webhooks.verify());
 
-app.post('/api/webhook', handlers.webhooks.events());
+app.post("/api/webhook", handlers.webhooks.events());
 
 strava.webhooks.onActivityCreate(async (event, athleteId) => {
-  console.log(`New activity created: ${event.object_id} by athlete ${athleteId}`);
+  console.log(
+    `New activity created: ${event.object_id} by athlete ${athleteId}`,
+  );
 });
 
 strava.webhooks.onAthleteDeauthorize(async (event, athleteId) => {

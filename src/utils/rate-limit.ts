@@ -2,8 +2,8 @@
  * Rate limiting utilities
  */
 
-import Bottleneck from 'bottleneck';
-import type { RateLimitConfig } from '../types';
+import Bottleneck from "bottleneck";
+import type { RateLimitConfig } from "../types";
 
 /**
  * Default Strava rate limits
@@ -24,9 +24,7 @@ export const DEFAULT_RATE_LIMITS: Required<RateLimitConfig> = {
 /**
  * Create a Bottleneck limiter configured for Strava's rate limits
  */
-export function createRateLimiter(
-  config?: RateLimitConfig,
-): Bottleneck {
+export function createRateLimiter(config?: RateLimitConfig): Bottleneck {
   const limits = {
     shortTerm: config?.shortTerm ?? DEFAULT_RATE_LIMITS.shortTerm,
     daily: config?.daily ?? DEFAULT_RATE_LIMITS.daily,
@@ -54,18 +52,16 @@ export interface RateLimitUsage {
   readonly dailyLimit: number;
 }
 
-export function parseRateLimitHeaders(
-  headers: Headers,
-): RateLimitUsage | null {
-  const usage = headers.get('X-RateLimit-Usage');
-  const limit = headers.get('X-RateLimit-Limit');
+export function parseRateLimitHeaders(headers: Headers): RateLimitUsage | null {
+  const usage = headers.get("X-RateLimit-Usage");
+  const limit = headers.get("X-RateLimit-Limit");
 
   if (!usage || !limit) {
     return null;
   }
 
-  const [shortTermUsed, dailyUsed] = usage.split(',').map(Number);
-  const [shortTermLimit, dailyLimit] = limit.split(',').map(Number);
+  const [shortTermUsed, dailyUsed] = usage.split(",").map(Number);
+  const [shortTermLimit, dailyLimit] = limit.split(",").map(Number);
 
   if (
     isNaN(shortTermUsed) ||

@@ -9,11 +9,11 @@ import type {
   OAuthConfig,
   AuthorizationOptions,
   OAuthTokenResponse,
-} from '../types';
-import { validateOAuthConfig } from '../utils';
+} from "../types";
+import { validateOAuthConfig } from "../utils";
 
-const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
-const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+const STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize";
+const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
 
 export class StravaOAuth {
   private readonly config: OAuthConfig;
@@ -21,7 +21,7 @@ export class StravaOAuth {
   constructor(config: OAuthConfig) {
     const errors = validateOAuthConfig(config);
     if (errors.length > 0) {
-      throw new Error(`OAuth configuration errors: ${errors.join(', ')}`);
+      throw new Error(`OAuth configuration errors: ${errors.join(", ")}`);
     }
     this.config = config;
   }
@@ -33,19 +33,20 @@ export class StravaOAuth {
    * @returns Authorization URL to redirect user to
    */
   getAuthUrl(options: AuthorizationOptions = {}): string {
-    const scopes = options.scopes ?? this.config.scopes ?? ['activity:read_all'];
-    const approvalPrompt = options.approvalPrompt ?? 'auto';
+    const scopes = options.scopes ??
+      this.config.scopes ?? ["activity:read_all"];
+    const approvalPrompt = options.approvalPrompt ?? "auto";
 
     const params = new URLSearchParams({
       client_id: this.config.clientId,
       redirect_uri: this.config.redirectUri,
-      response_type: 'code',
+      response_type: "code",
       approval_prompt: approvalPrompt,
-      scope: scopes.join(','),
+      scope: scopes.join(","),
     });
 
     if (options.state) {
-      params.set('state', options.state);
+      params.set("state", options.state);
     }
 
     return `${STRAVA_AUTH_URL}?${params.toString()}`;
@@ -60,15 +61,15 @@ export class StravaOAuth {
    */
   async exchangeCode(code: string): Promise<OAuthTokenResponse> {
     const response = await fetch(STRAVA_TOKEN_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
         code,
-        grant_type: 'authorization_code',
+        grant_type: "authorization_code",
       }),
     });
 
@@ -82,7 +83,7 @@ export class StravaOAuth {
     const tokenData = (await response.json()) as OAuthTokenResponse;
 
     if (!tokenData.athlete) {
-      throw new Error('Token response missing athlete data');
+      throw new Error("Token response missing athlete data");
     }
 
     return tokenData;
@@ -94,11 +95,11 @@ export class StravaOAuth {
    * @param accessToken - Access token to revoke
    */
   async revokeToken(accessToken: string): Promise<void> {
-    const response = await fetch('https://www.strava.com/oauth/deauthorize', {
-      method: 'POST',
+    const response = await fetch("https://www.strava.com/oauth/deauthorize", {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 

@@ -5,8 +5,8 @@
  * Do not use in production - tokens will be lost when the process restarts
  */
 
-import type { TokenStorage } from './interface';
-import type { StoredTokens } from '../types';
+import type { TokenStorage } from "./interface";
+import type { StoredTokens } from "../types";
 
 export class MemoryStorage implements TokenStorage {
   private tokens: Map<string, StoredTokens> = new Map();

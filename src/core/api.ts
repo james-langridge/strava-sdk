@@ -5,7 +5,7 @@
  * retry logic, and token refresh.
  */
 
-import Bottleneck from 'bottleneck';
+import Bottleneck from "bottleneck";
 import type {
   StravaActivity,
   StravaUpdateData,
@@ -18,11 +18,11 @@ import type {
   Logger,
   ApiCallInfo,
   RateLimitInfo,
-} from '../types';
-import { createRateLimiter, classifyError } from '../utils';
+} from "../types";
+import { createRateLimiter, classifyError } from "../utils";
 
-const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
-const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+const STRAVA_API_BASE = "https://www.strava.com/api/v3";
+const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
 const TOKEN_REFRESH_BUFFER = 5 * 60 * 1000; // 5 minutes
 
 export interface StravaApiConfig {
@@ -45,12 +45,12 @@ export class StravaApi {
     this.logger = config.logger;
     this.limiter = createRateLimiter(config.rateLimiting);
 
-    this.limiter.on('error', (error) => {
-      this.logger?.error('Rate limiter error', { error });
+    this.limiter.on("error", (error) => {
+      this.logger?.error("Rate limiter error", { error });
     });
 
-    this.limiter.on('depleted', () => {
-      this.logger?.warn('Rate limit reservoir depleted - queueing requests');
+    this.limiter.on("depleted", () => {
+      this.logger?.warn("Rate limit reservoir depleted - queueing requests");
     });
   }
 
@@ -62,7 +62,7 @@ export class StravaApi {
     accessToken: string,
   ): Promise<StravaActivity> {
     return this.limiter.schedule(async () => {
-      this.logger?.debug('Fetching activity from Strava', { activityId });
+      this.logger?.debug("Fetching activity from Strava", { activityId });
       const startTime = Date.now();
 
       try {
@@ -71,7 +71,7 @@ export class StravaApi {
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           },
         );
@@ -84,11 +84,11 @@ export class StravaApi {
         );
 
         if (!response.ok) {
-          await this.handleApiError(response, 'getActivity', { activityId });
+          await this.handleApiError(response, "getActivity", { activityId });
         }
 
         const activity = (await response.json()) as StravaActivity;
-        this.logger?.info('Activity retrieved successfully', { activityId });
+        this.logger?.info("Activity retrieved successfully", { activityId });
 
         return activity;
       } catch (error) {
@@ -112,7 +112,7 @@ export class StravaApi {
     accessToken: string,
   ): Promise<ActivityStats> {
     return this.limiter.schedule(async () => {
-      this.logger?.debug('Fetching athlete stats', { athleteId });
+      this.logger?.debug("Fetching athlete stats", { athleteId });
       const startTime = Date.now();
 
       try {
@@ -121,7 +121,7 @@ export class StravaApi {
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           },
         );
@@ -134,11 +134,13 @@ export class StravaApi {
         );
 
         if (!response.ok) {
-          await this.handleApiError(response, 'getAthleteStats', { athleteId });
+          await this.handleApiError(response, "getAthleteStats", { athleteId });
         }
 
         const stats = (await response.json()) as ActivityStats;
-        this.logger?.info('Athlete stats retrieved successfully', { athleteId });
+        this.logger?.info("Athlete stats retrieved successfully", {
+          athleteId,
+        });
 
         return stats;
       } catch (error) {
@@ -160,16 +162,19 @@ export class StravaApi {
   async getActivityStreams(
     activityId: string,
     accessToken: string,
-    streamKeys: string[] = ['latlng', 'distance'],
+    streamKeys: string[] = ["latlng", "distance"],
   ): Promise<ActivityStreams> {
     return this.limiter.schedule(async () => {
-      this.logger?.debug('Fetching activity streams', { activityId, streamKeys });
+      this.logger?.debug("Fetching activity streams", {
+        activityId,
+        streamKeys,
+      });
       const startTime = Date.now();
 
       try {
         const params = new URLSearchParams({
-          keys: streamKeys.join(','),
-          key_by_type: 'true',
+          keys: streamKeys.join(","),
+          key_by_type: "true",
         });
 
         const response = await fetch(
@@ -177,7 +182,7 @@ export class StravaApi {
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           },
         );
@@ -190,18 +195,18 @@ export class StravaApi {
         );
 
         if (response.status === 404) {
-          this.logger?.info('Activity streams not available', { activityId });
+          this.logger?.info("Activity streams not available", { activityId });
           return {};
         }
 
         if (!response.ok) {
-          await this.handleApiError(response, 'getActivityStreams', {
+          await this.handleApiError(response, "getActivityStreams", {
             activityId,
           });
         }
 
         const streams = (await response.json()) as ActivityStreams;
-        this.logger?.info('Activity streams retrieved successfully', {
+        this.logger?.info("Activity streams retrieved successfully", {
           activityId,
         });
 
@@ -228,17 +233,17 @@ export class StravaApi {
     updateData: StravaUpdateData,
   ): Promise<StravaActivity> {
     return this.limiter.schedule(async () => {
-      this.logger?.debug('Updating activity', { activityId, updateData });
+      this.logger?.debug("Updating activity", { activityId, updateData });
       const startTime = Date.now();
 
       try {
         const response = await fetch(
           `${STRAVA_API_BASE}/activities/${activityId}`,
           {
-            method: 'PUT',
+            method: "PUT",
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(updateData),
           },
@@ -252,11 +257,11 @@ export class StravaApi {
         );
 
         if (!response.ok) {
-          await this.handleApiError(response, 'updateActivity', { activityId });
+          await this.handleApiError(response, "updateActivity", { activityId });
         }
 
         const activity = (await response.json()) as StravaActivity;
-        this.logger?.info('Activity updated successfully', { activityId });
+        this.logger?.info("Activity updated successfully", { activityId });
 
         return activity;
       } catch (error) {
@@ -275,20 +280,22 @@ export class StravaApi {
   /**
    * Refresh access token
    */
-  async refreshAccessToken(refreshToken: string): Promise<TokenRefreshResponse> {
-    this.logger?.debug('Refreshing access token');
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<TokenRefreshResponse> {
+    this.logger?.debug("Refreshing access token");
 
     try {
       const response = await fetch(STRAVA_TOKEN_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           client_id: this.config.clientId,
           client_secret: this.config.clientSecret,
           refresh_token: refreshToken,
-          grant_type: 'refresh_token',
+          grant_type: "refresh_token",
         }),
       });
 
@@ -300,11 +307,11 @@ export class StravaApi {
       }
 
       const tokenData = (await response.json()) as TokenRefreshResponse;
-      this.logger?.info('Access token refreshed successfully');
+      this.logger?.info("Access token refreshed successfully");
 
       return tokenData;
     } catch (error) {
-      this.logger?.error('Failed to refresh access token', { error });
+      this.logger?.error("Failed to refresh access token", { error });
       throw error;
     }
   }
@@ -321,7 +328,7 @@ export class StravaApi {
     const bufferTime = new Date(now.getTime() + TOKEN_REFRESH_BUFFER);
 
     if (expiresAt <= bufferTime) {
-      this.logger?.info('Access token expiring soon, refreshing');
+      this.logger?.info("Access token expiring soon, refreshing");
 
       const tokenData = await this.refreshAccessToken(refreshToken);
 
@@ -353,9 +360,9 @@ export class StravaApi {
     if (!this.config.onApiCall) return;
 
     const info: ApiCallInfo = {
-      service: 'strava',
+      service: "strava",
       endpoint,
-      method: endpoint.split(' ')[0] ?? 'GET',
+      method: endpoint.split(" ")[0] ?? "GET",
       duration,
       statusCode: response?.status,
       error: error instanceof Error ? error.message : undefined,

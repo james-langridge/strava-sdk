@@ -26,7 +26,7 @@ export interface AuthenticatedAthlete {
   readonly profile?: string;
   readonly friend?: null;
   readonly follower?: null;
-  readonly measurement_preference?: 'feet' | 'meters';
+  readonly measurement_preference?: "feet" | "meters";
 }
 
 /**

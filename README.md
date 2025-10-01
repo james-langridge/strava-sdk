@@ -10,7 +10,7 @@ TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting.
 - **Webhook Support**: Full webhook subscription management and event handling
 - **Type-Safe**: Full TypeScript support with comprehensive type definitions
 - **Storage Agnostic**: Bring your own database via simple interface
-- **Framework Integrations**: Express middleware 
+- **Framework Integrations**: Express middleware
 - **Error Handling**: Detailed error classification and retry logic
 
 ## Installation
@@ -22,18 +22,18 @@ npm install strava-sdk
 ## Quick Start
 
 ```typescript
-import { StravaClient, MemoryStorage } from 'strava-sdk';
+import { StravaClient, MemoryStorage } from "strava-sdk";
 
 const strava = new StravaClient({
   clientId: process.env.STRAVA_CLIENT_ID!,
   clientSecret: process.env.STRAVA_CLIENT_SECRET!,
-  redirectUri: 'http://localhost:3000/auth/callback',
+  redirectUri: "http://localhost:3000/auth/callback",
   storage: new MemoryStorage(), // Use your own storage implementation
 });
 
 // Generate OAuth URL
 const authUrl = strava.oauth.getAuthUrl({
-  scopes: ['activity:read_all', 'activity:write'],
+  scopes: ["activity:read_all", "activity:write"],
 });
 
 // Exchange code for tokens
@@ -48,38 +48,41 @@ await strava.storage.saveTokens(tokens.athlete.id.toString(), {
 });
 
 // Get activity (with automatic token refresh)
-const activity = await strava.getActivityWithRefresh('12345', athleteId);
+const activity = await strava.getActivityWithRefresh("12345", athleteId);
 
 // Update activity
-await strava.updateActivityWithRefresh('12345', athleteId, {
-  description: 'Amazing ride!',
+await strava.updateActivityWithRefresh("12345", athleteId, {
+  description: "Amazing ride!",
 });
 ```
 
 ## Express Integration
 
 ```typescript
-import express from 'express';
-import { createExpressHandlers } from 'strava-sdk';
+import express from "express";
+import { createExpressHandlers } from "strava-sdk";
 
 const app = express();
-const handlers = createExpressHandlers(strava, 'webhook-verify-token');
+const handlers = createExpressHandlers(strava, "webhook-verify-token");
 
 // OAuth routes
-app.get('/auth/strava', handlers.oauth.authorize());
-app.get('/auth/callback', handlers.oauth.callback({
-  onSuccess: async (req, res, tokens) => {
-    // Save tokens and redirect
-    res.redirect('/dashboard');
-  },
-  onError: (req, res, error) => {
-    res.status(500).send('Auth failed');
-  },
-}));
+app.get("/auth/strava", handlers.oauth.authorize());
+app.get(
+  "/auth/callback",
+  handlers.oauth.callback({
+    onSuccess: async (req, res, tokens) => {
+      // Save tokens and redirect
+      res.redirect("/dashboard");
+    },
+    onError: (req, res, error) => {
+      res.status(500).send("Auth failed");
+    },
+  }),
+);
 
 // Webhook routes
-app.get('/api/webhook', handlers.webhooks.verify());
-app.post('/api/webhook', handlers.webhooks.events());
+app.get("/api/webhook", handlers.webhooks.verify());
+app.post("/api/webhook", handlers.webhooks.events());
 
 // Handle webhook events
 strava.webhooks.onActivityCreate(async (event, athleteId) => {
@@ -113,7 +116,7 @@ strava.webhooks.onAthleteDeauthorize(async (event, athleteId) => {
 For production, implement `TokenStorage` with your database:
 
 ```typescript
-import { TokenStorage, StoredTokens } from 'strava-sdk';
+import { TokenStorage, StoredTokens } from "strava-sdk";
 
 class YourDatabaseStorage implements TokenStorage {
   async getTokens(athleteId: string): Promise<StoredTokens | null> {

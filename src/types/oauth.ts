@@ -2,13 +2,13 @@
  * OAuth and token data types
  */
 
-import type { AuthenticatedAthlete } from './athlete';
+import type { AuthenticatedAthlete } from "./athlete";
 
 /**
  * OAuth token response from Strava
  */
 export interface OAuthTokenResponse {
-  readonly token_type: 'Bearer';
+  readonly token_type: "Bearer";
   readonly expires_at: number;
   readonly expires_in: number;
   readonly refresh_token: string;
@@ -20,7 +20,7 @@ export interface OAuthTokenResponse {
  * Token refresh response
  */
 export interface TokenRefreshResponse {
-  readonly token_type: 'Bearer';
+  readonly token_type: "Bearer";
   readonly access_token: string;
   readonly expires_at: number;
   readonly expires_in: number;
@@ -65,5 +65,5 @@ export interface OAuthConfig {
 export interface AuthorizationOptions {
   readonly state?: string;
   readonly scopes?: readonly string[];
-  readonly approvalPrompt?: 'auto' | 'force';
+  readonly approvalPrompt?: "auto" | "force";
 }

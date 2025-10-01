@@ -12,8 +12,8 @@ import type {
   ActivityDeleteHandler,
   DeauthorizeHandler,
   Logger,
-} from '../types';
-import { isHttpsUrl } from '../utils';
+} from "../types";
+import { isHttpsUrl } from "../utils";
 
 export interface WebhookManagerConfig {
   readonly clientId: string;
@@ -22,7 +22,7 @@ export interface WebhookManagerConfig {
   readonly logger?: Logger;
 }
 
-const STRAVA_WEBHOOK_URL = 'https://www.strava.com/api/v3/push_subscriptions';
+const STRAVA_WEBHOOK_URL = "https://www.strava.com/api/v3/push_subscriptions";
 
 export class StravaWebhooks {
   private readonly config: WebhookManagerConfig;
@@ -48,23 +48,23 @@ export class StravaWebhooks {
    * View current webhook subscription
    */
   async viewSubscription(): Promise<WebhookSubscription | null> {
-    this.logger?.debug('Checking for existing webhook subscription');
+    this.logger?.debug("Checking for existing webhook subscription");
 
     try {
       const url = new URL(STRAVA_WEBHOOK_URL);
-      url.searchParams.set('client_id', this.config.clientId);
-      url.searchParams.set('client_secret', this.config.clientSecret);
+      url.searchParams.set("client_id", this.config.clientId);
+      url.searchParams.set("client_secret", this.config.clientSecret);
 
       const response = await fetch(url.toString(), {
-        method: 'GET',
+        method: "GET",
         headers: {
-          Accept: 'application/json',
+          Accept: "application/json",
         },
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        this.logger?.error('Failed to retrieve webhook subscription', {
+        this.logger?.error("Failed to retrieve webhook subscription", {
           status: response.status,
           error: errorText,
         });
@@ -77,16 +77,16 @@ export class StravaWebhooks {
 
       if (Array.isArray(data) && data.length > 0) {
         const subscription = data[0] as WebhookSubscription;
-        this.logger?.info('Found existing webhook subscription', {
+        this.logger?.info("Found existing webhook subscription", {
           subscriptionId: subscription.id,
         });
         return subscription;
       }
 
-      this.logger?.debug('No existing webhook subscription found');
+      this.logger?.debug("No existing webhook subscription found");
       return null;
     } catch (error) {
-      this.logger?.error('Error retrieving webhook subscription', { error });
+      this.logger?.error("Error retrieving webhook subscription", { error });
       throw error;
     }
   }
@@ -95,18 +95,18 @@ export class StravaWebhooks {
    * Create a new webhook subscription
    */
   async createSubscription(callbackUrl: string): Promise<WebhookSubscription> {
-    this.logger?.info('Creating webhook subscription', { callbackUrl });
+    this.logger?.info("Creating webhook subscription", { callbackUrl });
 
     try {
       const existing = await this.viewSubscription();
       if (existing) {
         throw new Error(
-          'Subscription already exists. Delete existing subscription first.',
+          "Subscription already exists. Delete existing subscription first.",
         );
       }
 
       if (!isHttpsUrl(callbackUrl)) {
-        throw new Error('Callback URL must use HTTPS protocol');
+        throw new Error("Callback URL must use HTTPS protocol");
       }
 
       const formData = new URLSearchParams({
@@ -117,16 +117,16 @@ export class StravaWebhooks {
       });
 
       const response = await fetch(STRAVA_WEBHOOK_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         body: formData.toString(),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        this.logger?.error('Failed to create webhook subscription', {
+        this.logger?.error("Failed to create webhook subscription", {
           status: response.status,
           error: errorText,
         });
@@ -134,13 +134,13 @@ export class StravaWebhooks {
       }
 
       const subscription = (await response.json()) as WebhookSubscription;
-      this.logger?.info('Webhook subscription created successfully', {
+      this.logger?.info("Webhook subscription created successfully", {
         subscriptionId: subscription.id,
       });
 
       return subscription;
     } catch (error) {
-      this.logger?.error('Error creating webhook subscription', { error });
+      this.logger?.error("Error creating webhook subscription", { error });
       throw error;
     }
   }
@@ -149,7 +149,7 @@ export class StravaWebhooks {
    * Delete a webhook subscription
    */
   async deleteSubscription(subscriptionId: number): Promise<void> {
-    this.logger?.info('Deleting webhook subscription', { subscriptionId });
+    this.logger?.info("Deleting webhook subscription", { subscriptionId });
 
     try {
       const url = `${STRAVA_WEBHOOK_URL}/${subscriptionId}`;
@@ -159,11 +159,11 @@ export class StravaWebhooks {
       });
 
       const response = await fetch(`${url}?${params}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.status === 204) {
-        this.logger?.info('Webhook subscription deleted successfully', {
+        this.logger?.info("Webhook subscription deleted successfully", {
           subscriptionId,
         });
         return;
@@ -171,15 +171,17 @@ export class StravaWebhooks {
 
       if (!response.ok) {
         const errorText = await response.text();
-        this.logger?.error('Failed to delete webhook subscription', {
+        this.logger?.error("Failed to delete webhook subscription", {
           subscriptionId,
           status: response.status,
           error: errorText,
         });
-        throw new Error(`Failed to delete subscription: ${response.statusText}`);
+        throw new Error(
+          `Failed to delete subscription: ${response.statusText}`,
+        );
       }
     } catch (error) {
-      this.logger?.error('Error deleting webhook subscription', { error });
+      this.logger?.error("Error deleting webhook subscription", { error });
       throw error;
     }
   }
@@ -216,27 +218,27 @@ export class StravaWebhooks {
    * Process incoming webhook event
    */
   async processEvent(event: WebhookEvent): Promise<void> {
-    this.logger?.debug('Processing webhook event', {
+    this.logger?.debug("Processing webhook event", {
       objectType: event.object_type,
       aspectType: event.aspect_type,
       objectId: event.object_id,
     });
 
     try {
-      if (event.object_type === 'activity') {
-        if (event.aspect_type === 'create') {
+      if (event.object_type === "activity") {
+        if (event.aspect_type === "create") {
           await this.invokeHandlers(
             this.handlers.activityCreate,
             event,
             event.owner_id,
           );
-        } else if (event.aspect_type === 'update') {
+        } else if (event.aspect_type === "update") {
           await this.invokeHandlers(
             this.handlers.activityUpdate,
             event,
             event.owner_id,
           );
-        } else if (event.aspect_type === 'delete') {
+        } else if (event.aspect_type === "delete") {
           await this.invokeHandlers(
             this.handlers.activityDelete,
             event,
@@ -244,8 +246,8 @@ export class StravaWebhooks {
           );
         }
       } else if (
-        event.object_type === 'athlete' &&
-        event.aspect_type === 'deauthorize'
+        event.object_type === "athlete" &&
+        event.aspect_type === "deauthorize"
       ) {
         await this.invokeHandlers(
           this.handlers.deauthorize,
@@ -254,7 +256,7 @@ export class StravaWebhooks {
         );
       }
     } catch (error) {
-      this.logger?.error('Error processing webhook event', {
+      this.logger?.error("Error processing webhook event", {
         event,
         error,
       });
@@ -266,7 +268,9 @@ export class StravaWebhooks {
    * Invoke all handlers for an event
    */
   private async invokeHandlers(
-    handlers: Array<(event: WebhookEvent, athleteId: number) => void | Promise<void>>,
+    handlers: Array<
+      (event: WebhookEvent, athleteId: number) => void | Promise<void>
+    >,
     event: WebhookEvent,
     athleteId: number,
   ): Promise<void> {

@@ -12,11 +12,13 @@ A minimal example showing how to use `strava-sdk` with Express.
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Create `.env` file:
+
 ```bash
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
@@ -31,6 +33,7 @@ PORT=3000
    - Copy the Client ID and Client Secret
 
 4. Run the app:
+
 ```bash
 npm run dev
 ```
@@ -40,12 +43,14 @@ npm run dev
 ## Usage
 
 ### OAuth Flow
+
 1. Visit `/` to see the homepage
 2. Click "Connect with Strava"
 3. Authorize the app on Strava
 4. You'll be redirected back with your athlete info
 
 ### Webhooks
+
 1. Set up a webhook subscription at `/webhook/create`
 2. Strava will send events to `/api/webhook`
 3. Events are logged to the console

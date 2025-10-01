@@ -22,11 +22,11 @@ export function validateWebhookVerification(
   if (!params.mode || !params.token || !params.challenge) {
     return {
       valid: false,
-      reason: 'Missing required verification parameters',
+      reason: "Missing required verification parameters",
     };
   }
 
-  if (params.mode !== 'subscribe') {
+  if (params.mode !== "subscribe") {
     return {
       valid: false,
       reason: `Invalid verification mode: ${params.mode}`,
@@ -36,7 +36,7 @@ export function validateWebhookVerification(
   if (params.token !== expectedToken) {
     return {
       valid: false,
-      reason: 'Invalid verification token',
+      reason: "Invalid verification token",
     };
   }
 
@@ -57,13 +57,13 @@ export function validateOAuthConfig(config: {
   const errors: string[] = [];
 
   if (!config.clientId) {
-    errors.push('clientId is required');
+    errors.push("clientId is required");
   }
   if (!config.clientSecret) {
-    errors.push('clientSecret is required');
+    errors.push("clientSecret is required");
   }
   if (!config.redirectUri) {
-    errors.push('redirectUri is required');
+    errors.push("redirectUri is required");
   }
 
   return errors;
@@ -87,7 +87,7 @@ export function isValidUrl(url: string): boolean {
 export function isHttpsUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.protocol === 'https:';
+    return parsed.protocol === "https:";
   } catch {
     return false;
   }

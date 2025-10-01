@@ -4,11 +4,11 @@
  * Provides unified interface to all Strava API functionality.
  */
 
-import type { StravaClientConfig } from '../types';
-import type { TokenStorage } from '../storage';
-import { StravaOAuth } from './oauth';
-import { StravaApi } from './api';
-import { StravaWebhooks } from './webhooks';
+import type { StravaClientConfig } from "../types";
+import type { TokenStorage } from "../storage";
+import { StravaOAuth } from "./oauth";
+import { StravaApi } from "./api";
+import { StravaWebhooks } from "./webhooks";
 
 export class StravaClient {
   public readonly oauth: StravaOAuth;
@@ -18,13 +18,13 @@ export class StravaClient {
 
   constructor(config: StravaClientConfig) {
     if (!config.clientId || !config.clientSecret) {
-      throw new Error('clientId and clientSecret are required');
+      throw new Error("clientId and clientSecret are required");
     }
     if (!config.redirectUri) {
-      throw new Error('redirectUri is required');
+      throw new Error("redirectUri is required");
     }
     if (!config.storage) {
-      throw new Error('storage implementation is required');
+      throw new Error("storage implementation is required");
     }
 
     this.storage = config.storage;
@@ -49,7 +49,7 @@ export class StravaClient {
     this.webhooks = new StravaWebhooks({
       clientId: config.clientId,
       clientSecret: config.clientSecret,
-      verifyToken: config.webhooks?.verifyToken ?? 'STRAVA',
+      verifyToken: config.webhooks?.verifyToken ?? "STRAVA",
       logger: config.logger,
     });
   }

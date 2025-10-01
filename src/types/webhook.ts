@@ -16,9 +16,9 @@ export interface WebhookSubscription {
  * Strava webhook event
  */
 export interface WebhookEvent {
-  readonly object_type: 'activity' | 'athlete';
+  readonly object_type: "activity" | "athlete";
   readonly object_id: number;
-  readonly aspect_type: 'create' | 'update' | 'delete' | 'deauthorize';
+  readonly aspect_type: "create" | "update" | "delete" | "deauthorize";
   readonly owner_id: number;
   readonly subscription_id: number;
   readonly event_time: number;
@@ -29,16 +29,16 @@ export interface WebhookEvent {
  * Webhook verification parameters from Strava
  */
 export interface WebhookVerificationParams {
-  readonly 'hub.mode'?: string;
-  readonly 'hub.verify_token'?: string;
-  readonly 'hub.challenge'?: string;
+  readonly "hub.mode"?: string;
+  readonly "hub.verify_token"?: string;
+  readonly "hub.challenge"?: string;
 }
 
 /**
  * Webhook verification result
  */
 export interface WebhookVerificationResult {
-  readonly 'hub.challenge': string;
+  readonly "hub.challenge": string;
 }
 
 /**
