@@ -37,7 +37,7 @@
     "rate-limiting",
     "typescript"
   ],
-  "author": "",
+  "author": "James Langridge <l@ngridge.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
