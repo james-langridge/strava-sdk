@@ -1,7 +1,7 @@
 {
   "name": "strava-sdk",
   "version": "0.1.0",
-  "description": "Production-ready TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting",
+  "description": "TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -41,7 +41,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/strava-sdk.git"
+    "url": "https://github.com/james-langridge/strava-sdk.git"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -1,6 +1,6 @@
 # Strava SDK
 
-Production-ready TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting.
+TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting.
 
 ## Features
 
@@ -10,9 +10,8 @@ Production-ready TypeScript SDK for Strava API with OAuth, webhooks, and rate li
 - **Webhook Support**: Full webhook subscription management and event handling
 - **Type-Safe**: Full TypeScript support with comprehensive type definitions
 - **Storage Agnostic**: Bring your own database via simple interface
-- **Framework Integrations**: Express middleware (more frameworks coming soon)
+- **Framework Integrations**: Express middleware 
 - **Error Handling**: Detailed error classification and retry logic
-- **Well Tested**: 108 tests with comprehensive coverage
 
 ## Installation
 
@@ -151,20 +150,6 @@ Check out the [examples](./examples/) directory for complete applications:
 
 - Node.js 18 or higher
 - TypeScript 5.0 or higher (for TypeScript projects)
-
-## Why This SDK?
-
-Compared to other Strava libraries, this SDK provides:
-
-- ✅ Full TypeScript support with excellent DX
-- ✅ Built-in rate limiting (respects Strava's 200/15min, 2000/day limits)
-- ✅ Complete webhook support with event handlers
-- ✅ Modern async/await API
-- ✅ Framework integrations (Express, more coming)
-- ✅ Storage-agnostic design
-- ✅ Production-ready error handling
-- ✅ Actively maintained
-- ✅ Comprehensive test coverage (108 tests)
 
 ## Contributing
 
