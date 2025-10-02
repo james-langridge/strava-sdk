@@ -105,6 +105,68 @@ export class StravaApi {
   }
 
   /**
+   * List athlete activities
+   */
+  async listAthleteActivities(
+    accessToken: string,
+    params?: {
+      before?: number;
+      after?: number;
+      page?: number;
+      per_page?: number;
+    },
+  ): Promise<StravaActivity[]> {
+    return this.limiter.schedule(async () => {
+      const queryParams = new URLSearchParams();
+      if (params?.before) queryParams.set("before", params.before.toString());
+      if (params?.after) queryParams.set("after", params.after.toString());
+      if (params?.page) queryParams.set("page", params.page.toString());
+      if (params?.per_page) queryParams.set("per_page", params.per_page.toString());
+
+      const url = `${STRAVA_API_BASE}/athlete/activities${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+
+      this.logger?.debug("Fetching athlete activities", { params });
+      const startTime = Date.now();
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const duration = Date.now() - startTime;
+        await this.recordApiCall(
+          `GET /athlete/activities`,
+          duration,
+          response,
+        );
+
+        if (!response.ok) {
+          await this.handleApiError(response, "listAthleteActivities", { params });
+        }
+
+        const activities = (await response.json()) as StravaActivity[];
+        this.logger?.info("Athlete activities retrieved successfully", {
+          count: activities.length,
+        });
+
+        return activities;
+      } catch (error) {
+        const duration = Date.now() - startTime;
+        await this.recordApiCall(
+          `GET /athlete/activities`,
+          duration,
+          undefined,
+          error,
+        );
+        throw error;
+      }
+    });
+  }
+
+  /**
    * Get athlete statistics
    */
   async getAthleteStats(

@@ -121,4 +121,34 @@ export class StravaClient {
       updateData,
     );
   }
+
+  /**
+   * List athlete activities with automatic token refresh
+   */
+  async listAthleteActivitiesWithRefresh(
+    athleteId: string,
+    params?: Parameters<typeof this.api.listAthleteActivities>[1],
+  ): Promise<ReturnType<typeof this.api.listAthleteActivities>> {
+    const tokens = await this.storage.getTokens(athleteId);
+    if (!tokens) {
+      throw new Error(`No tokens found for athlete ${athleteId}`);
+    }
+
+    const validTokens = await this.api.ensureValidToken(
+      tokens.accessToken,
+      tokens.refreshToken,
+      tokens.expiresAt,
+    );
+
+    if (validTokens.wasRefreshed) {
+      await this.storage.saveTokens(athleteId, {
+        ...tokens,
+        accessToken: validTokens.accessToken,
+        refreshToken: validTokens.refreshToken,
+        expiresAt: validTokens.expiresAt,
+      });
+    }
+
+    return this.api.listAthleteActivities(validTokens.accessToken, params);
+  }
 }
