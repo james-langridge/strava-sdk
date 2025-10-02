@@ -1,6 +1,6 @@
 {
   "name": "strava-sdk",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
