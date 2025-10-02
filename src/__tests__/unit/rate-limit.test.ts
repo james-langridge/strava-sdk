@@ -6,13 +6,13 @@ import {
 } from "../../utils/rate-limit";
 
 describe("DEFAULT_RATE_LIMITS", () => {
-  it("has correct short term limits", () => {
-    expect(DEFAULT_RATE_LIMITS.shortTerm.requests).toBe(200);
+  it("has correct short term limits for non-approved apps", () => {
+    expect(DEFAULT_RATE_LIMITS.shortTerm.requests).toBe(100);
     expect(DEFAULT_RATE_LIMITS.shortTerm.per).toBe(15 * 60 * 1000);
   });
 
-  it("has correct daily limits", () => {
-    expect(DEFAULT_RATE_LIMITS.daily.requests).toBe(2000);
+  it("has correct daily limits for non-approved apps", () => {
+    expect(DEFAULT_RATE_LIMITS.daily.requests).toBe(1000);
     expect(DEFAULT_RATE_LIMITS.daily.per).toBe(24 * 60 * 60 * 1000);
   });
 });
