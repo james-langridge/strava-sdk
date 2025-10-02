@@ -19,7 +19,7 @@ import type {
   ApiCallInfo,
   RateLimitInfo,
 } from "../types";
-import { createRateLimiter, classifyError } from "../utils";
+import { createRateLimiter, classifyError, parseRateLimitHeaders, StravaApiError, RateLimitError } from "../utils";
 
 const STRAVA_API_BASE = "https://www.strava.com/api/v3";
 const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
@@ -447,12 +447,32 @@ export class StravaApi {
       `${operation}`,
     );
 
+    // Parse rate limit headers if available
+    const rateLimitUsage = parseRateLimitHeaders(response.headers);
+
+    // Log rate limit info if available
+    if (rateLimitUsage && this.config.onRateLimit) {
+      await this.config.onRateLimit({
+        limit15Min: rateLimitUsage.shortTermLimit,
+        used15Min: rateLimitUsage.shortTermUsed,
+        limitDaily: rateLimitUsage.dailyLimit,
+        usedDaily: rateLimitUsage.dailyUsed,
+        endpoint: operation,
+      });
+    }
+
     this.logger?.error(`${operation} failed`, {
       ...context,
       status: response.status,
       error: errorText,
+      rateLimitUsage,
     });
 
-    throw new Error(error.message);
+    // Throw specific error type based on classification
+    if (error.errorCode === "RATE_LIMITED") {
+      throw new RateLimitError(error, rateLimitUsage ?? undefined);
+    }
+
+    throw new StravaApiError(error);
   }
 }

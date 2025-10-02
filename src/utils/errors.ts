@@ -3,6 +3,63 @@
  */
 
 import type { StravaError } from "../types";
+import type { RateLimitUsage } from "./rate-limit";
+
+/**
+ * Base error class for all Strava API errors
+ */
+export class StravaApiError extends Error {
+  public readonly statusCode?: number;
+  public readonly errorCode: string;
+  public readonly isRetryable: boolean;
+  public readonly endpoint?: string;
+
+  constructor(error: StravaError) {
+    super(error.message);
+    this.name = "StravaApiError";
+    this.statusCode = error.statusCode;
+    this.errorCode = error.errorCode;
+    this.isRetryable = error.isRetryable;
+    this.endpoint = error.endpoint;
+
+    // Maintains proper stack trace for where our error was thrown
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, StravaApiError);
+    }
+  }
+}
+
+/**
+ * Rate limit error with detailed rate limit information
+ */
+export class RateLimitError extends StravaApiError {
+  public readonly rateLimitUsage?: RateLimitUsage;
+  public readonly retryAfter?: number; // seconds to wait before retrying
+
+  constructor(error: StravaError, rateLimitUsage?: RateLimitUsage) {
+    super(error);
+    this.name = "RateLimitError";
+    this.rateLimitUsage = rateLimitUsage;
+
+    // Calculate retry time based on which limit was hit
+    if (rateLimitUsage) {
+      const shortTermExceeded = rateLimitUsage.shortTermUsed >= rateLimitUsage.shortTermLimit;
+      const dailyExceeded = rateLimitUsage.dailyUsed >= rateLimitUsage.dailyLimit;
+
+      if (dailyExceeded) {
+        // If daily limit exceeded, wait longer
+        this.retryAfter = 3600; // 1 hour
+      } else if (shortTermExceeded) {
+        // If 15-min limit exceeded, wait 15 minutes
+        this.retryAfter = 900; // 15 minutes
+      }
+    }
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, RateLimitError);
+    }
+  }
+}
 
 /**
  * Classify error and determine if it's retryable
