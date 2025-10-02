@@ -6,11 +6,16 @@ import Bottleneck from "bottleneck";
 import type { RateLimitConfig } from "../types";
 
 /**
- * Default Strava rate limits for non-approved apps
+ * Default Strava rate limits for "non-upload" endpoints
  * - 100 requests per 15 minutes
  * - 1000 requests per day
  *
- * Approved apps can override these by passing rateLimiting config to StravaClient
+ * Note: Upload endpoints (POST /activities, POST /uploads) have higher limits:
+ * - 200 requests per 15 minutes
+ * - 2000 requests per day
+ *
+ * Apps with approved rate limit increases can override these defaults
+ * by passing custom rateLimiting config to StravaClient
  */
 export const DEFAULT_RATE_LIMITS: Required<RateLimitConfig> = {
   shortTerm: {
