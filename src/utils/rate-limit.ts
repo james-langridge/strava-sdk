@@ -26,6 +26,7 @@ export const DEFAULT_RATE_LIMITS: Required<RateLimitConfig> = {
     requests: 1000,
     per: 24 * 60 * 60 * 1000, // 24 hours in ms
   },
+  minTime: 6000, // 6 seconds between requests
 };
 
 /**
@@ -37,9 +38,12 @@ export function createRateLimiter(config?: RateLimitConfig): Bottleneck {
     daily: config?.daily ?? DEFAULT_RATE_LIMITS.daily,
   };
 
+  // Allow configurable minTime, default to 6000ms (6 seconds)
+  const minTime = config?.minTime ?? 6000;
+
   return new Bottleneck({
     // Conservative settings to stay well under limits
-    minTime: 6000, // Minimum 6 seconds between requests (~10/min)
+    minTime, // Minimum time between requests (~10/min with default 6000ms)
     maxConcurrent: 1, // One request at a time
 
     // Start with most of the 15-min limit available

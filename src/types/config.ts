@@ -14,6 +14,7 @@ export interface RateLimitConfig {
     readonly requests: number;
     readonly per: number;
   };
+  readonly minTime?: number; // Minimum time between requests in ms (default 6000)
 }
 
 /**
