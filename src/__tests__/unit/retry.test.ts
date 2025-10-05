@@ -4,7 +4,7 @@ import {
   getRetryDelay,
   sleep,
   retryWithBackoff,
-} from "../../utils/retry";
+} from "../../utils";
 
 describe("calculateRetryDelay", () => {
   it("calculates exponential backoff correctly", () => {

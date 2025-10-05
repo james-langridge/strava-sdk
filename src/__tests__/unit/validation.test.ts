@@ -4,7 +4,7 @@ import {
   validateOAuthConfig,
   isValidUrl,
   isHttpsUrl,
-} from "../../utils/validation";
+} from "../../utils";
 
 describe("validateWebhookVerification", () => {
   it("validates correct webhook verification parameters", () => {

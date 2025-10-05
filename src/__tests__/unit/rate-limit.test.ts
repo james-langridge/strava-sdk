@@ -3,7 +3,7 @@ import {
   DEFAULT_RATE_LIMITS,
   createRateLimiter,
   parseRateLimitHeaders,
-} from "../../utils/rate-limit";
+} from "../../utils";
 
 describe("DEFAULT_RATE_LIMITS", () => {
   it("has correct short term limits for non-approved apps", () => {

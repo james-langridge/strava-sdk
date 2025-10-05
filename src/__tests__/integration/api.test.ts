@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { StravaApi } from "../../core/api";
+import { StravaApi } from "../../core";
 
 describe("StravaApi Integration", () => {
   let api: StravaApi;

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { StravaWebhooks } from "../../core/webhooks";
+import { StravaWebhooks } from "../../core";
 import type { WebhookEvent } from "../../types";
 
 describe("StravaWebhooks Integration", () => {

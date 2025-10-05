@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response, RequestHandler } from "express";
-import type { StravaClient } from "../core/client";
+import type { StravaClient } from "../core";
 import type { WebhookEvent, WebhookVerificationParams } from "../types";
 import { validateWebhookVerification } from "../utils";
 

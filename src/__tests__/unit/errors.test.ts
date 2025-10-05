@@ -3,7 +3,7 @@ import {
   classifyError,
   isTemporaryError,
   isAuthenticationError,
-} from "../../utils/errors";
+} from "../../utils";
 
 describe("classifyError", () => {
   it("classifies 401 errors as UNAUTHORIZED", () => {

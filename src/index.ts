@@ -1,7 +1,7 @@
 /**
  * Strava SDK
  *
- * Production-ready TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting.
+ * TypeScript SDK for Strava API with OAuth, webhooks, and rate limiting.
  */
 
 export * from "./core";
